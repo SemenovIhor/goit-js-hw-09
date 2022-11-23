@@ -44,7 +44,7 @@ btnStart.addEventListener("click", () => {
                 const counterTime = Date.now() - currentTime;
                 const deltaTime = selectedTime - currentTime;
                 let resultTime = deltaTime - counterTime;
-                if (resultTime <= 0) {
+                if (resultTime <  1000) {
                     timer.stop()
                     }
                 const { days, hours, minutes, seconds } = convertMs(resultTime);
