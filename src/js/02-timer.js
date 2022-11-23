@@ -10,6 +10,7 @@ const clockHours = document.querySelector("span[data-hours]");
 const clockMinutes = document.querySelector("span[data-minutes]");
 const clockSeconds = document.querySelector("span[data-seconds]");
 
+let selectedTime = 1;
 
 
 btnStart.disabled = true;
@@ -20,48 +21,43 @@ const options = {
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {  
-    selectedDates[0];
+    selectedTime = selectedDates[0].getTime();
+    if ( selectedDates[0] <= options.defaultDate) {
+        window.alert("Please choose a date in the future")
+        btnStart.disabled = true;
+        } else {    
+        btnStart.disabled = false;
+        }
   },
 };
 
+const currentTime = options.defaultDate.getTime();
+
 flatpickr(selectorInput, options);
 
-selectorInput.addEventListener("input", () => {
-    let dataSelect = new Date(selectorInput.value).getTime(); 
-    let dataСurrent = new Date(options.defaultDate).getTime();
-    let dataDelta = dataSelect - dataСurrent;
-    
-    if (dataSelect <= dataСurrent) {
-        window.alert("Please choose a date in the future")
-        btnStart.disabled = false;
-    } else {    
-        btnStart.disabled = false;
-        
-        btnStart.addEventListener("click", () => {
-            btnStart.disabled = true;
-            const timer = {
-                start() {
-                    const startTime = Date.now();
-                    this.intervalID = setInterval(() => {
-                        const currentTime = Date.now();
-                        const deltaTime = currentTime - startTime;
-                        const resultTime = dataDelta - deltaTime;
-                        const { days, hours, minutes, seconds } = convertMs(resultTime);
-                        updateClockface({ days, hours, minutes, seconds })
-                        console.log(days + '::' + hours + ':' + minutes + ':' + seconds);
-                        if (resultTime <=0) {
-                            timer.stop()
-                        }
-                    }, 1000);
-                },
-                stop() {
+
+btnStart.addEventListener("click", () => {
+    btnStart.disabled = true;
+    const timer = {
+         start() {
+            this.intervalID = setInterval(() => {
+                const counterTime = Date.now() - currentTime;
+                const deltaTime = selectedTime - currentTime;
+                let resultTime = deltaTime - counterTime;
+                if (resultTime <= 0) {
+                    timer.stop()
+                    }
+                const { days, hours, minutes, seconds } = convertMs(resultTime);
+                updateClockface({ days, hours, minutes, seconds })
+                console.log(days + '::' + hours + ':' + minutes + ':' + seconds);
+                }, 1000);
+            },
+            stop() {
                     clearInterval(this.intervalID)
                 }
-            };
-            timer.start();
-         });
-    }
-});
+         };
+        timer.start();
+    });
 
 function pad(value) {
     return String(value).padStart(2, '0');
